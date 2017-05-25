@@ -41,7 +41,7 @@ static double now_ms(void)
 
 static uint16_t  palette[PALETTE_SIZE];
 
-static uint16_t  make565(int red, int green, int blue)
+static __inline__ uint16_t  make565(int red, int green, int blue)
 {
     return (uint16_t)( ((red   << 8) & 0xf800) |
                       ((green << 3) & 0x07e0) |
@@ -141,8 +141,8 @@ void fill_plasma(void* pixels, const int width, const int height, const unsigned
         yt1 += YT1_INCR;
         yt2 += YT2_INCR;
         
-#define  XT1_INCR  FIXED_FROM_FLOAT(1/173.)
-#define  XT2_INCR  FIXED_FROM_FLOAT(1/242.)
+#define  XT1_INCR  FIXED_FROM_FLOAT(1/240.)
+#define  XT2_INCR  XT1_INCR
         
 #if OPTIMIZE_WRITES
         /* optimize memory writes by generating one aligned 32-bit store
@@ -157,7 +157,6 @@ void fill_plasma(void* pixels, const int width, const int height, const unsigned
                 xt1 += XT1_INCR;
                 xt2 += XT2_INCR;
                 
-                //line[0] = palette_from_fixed(ii >> 2);
                 set_pixel(line, ii >> 2);
                 line++;
             }
