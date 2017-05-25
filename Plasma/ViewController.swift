@@ -10,7 +10,7 @@ import UIKit
 import Foundation
 
 class ViewController: UIViewController {
-    let INTERVAL: Double = 1.0 / 30
+    let INTERVAL: Double = 1.0 / 45
     let BYTES_PER_PIXEL = 4
     let IMAGE_SCALE: CGFloat  = 1
     
@@ -77,11 +77,12 @@ class ViewController: UIViewController {
             .RenderingIntentDefault
         )
         
-        // TODO is there a better way?
+        // TODO: is there a better way?
         uiImageView?.image = UIImage(CGImage: cgim!)
     }
     
     /*
+    // Only needed when using RGB565 format
     private func convert2RBG() -> CGImage? {
         var index = 0
         var r, g, b: UInt8
