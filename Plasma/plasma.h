@@ -10,7 +10,6 @@
 #define plasma_h
 
 #include "fixed.h"
-#include "bitmap.h"
 
 /* Set to 1 to enable debug log traces. */
 #define DEBUG 0
@@ -35,6 +34,11 @@ typedef struct {
 #define  MAX_FRAME_STATS  200
 #define  MAX_PERIOD_MS    1500
 
+// pixel formats
+#define  RGB565 uint16_t
+#define  ARGB uint32_t
+#define  PIXEL ARGB
+
 typedef struct {
     double  firstTime;
     double  lastTime;
@@ -46,6 +50,6 @@ typedef struct {
 } Stats;
 
 // apis
-void renderPlasma(BitmapInfo * info, void* pixels, long time_ms);
+void renderPlasma(void* pixels, const int width, const int height, const unsigned long time_ms);
 
 #endif /* plasma_h */

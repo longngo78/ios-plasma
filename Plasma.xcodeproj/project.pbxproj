@@ -42,7 +42,6 @@
 		A2295FA01ED61FE4008F3190 /* plasma.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = plasma.h; sourceTree = "<group>"; };
 		A2295FA21ED624C8008F3190 /* fixed.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fixed.h; sourceTree = "<group>"; };
 		A2295FA31ED62545008F3190 /* quickmath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = quickmath.h; sourceTree = "<group>"; };
-		A2295FA41ED62635008F3190 /* bitmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bitmap.h; sourceTree = "<group>"; };
 		A2295FA51ED6289B008F3190 /* ioshelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ioshelper.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -93,7 +92,6 @@
 				A2295F8A1ED61F40008F3190 /* Info.plist */,
 				A2295F9F1ED61FE4008F3190 /* plasma.c */,
 				A2295FA51ED6289B008F3190 /* ioshelper.h */,
-				A2295FA41ED62635008F3190 /* bitmap.h */,
 				A2295FA21ED624C8008F3190 /* fixed.h */,
 				A2295FA31ED62545008F3190 /* quickmath.h */,
 				A2295FA01ED61FE4008F3190 /* plasma.h */,
@@ -416,6 +414,7 @@
 				A2295F9A1ED61F40008F3190 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		A2295F9B1ED61F40008F3190 /* Build configuration list for PBXNativeTarget "PlasmaTests" */ = {
 			isa = XCConfigurationList;
@@ -424,6 +423,7 @@
 				A2295F9D1ED61F40008F3190 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

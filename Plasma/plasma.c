@@ -25,7 +25,6 @@
 #include "plasma.h"
 #include "fixed.h"
 #include "quickmath.h"
-#include "bitmap.h"
 #include "ioshelper.h"
 
 #include <stdio.h>
@@ -74,12 +73,43 @@ static void init_palette(void)
     }
 }
 
+/*
 static __inline__ uint16_t  palette_from_fixed( Fixed  x )
 {
     if (x < 0) x = -x;
     if (x >= FIXED_ONE) x = FIXED_ONE-1;
     int  idx = FIXED_FRAC(x) >> (FIXED_BITS - PALETTE_BITS);
     return palette[idx & (PALETTE_SIZE-1)];
+}
+*/
+
+static __inline__ void  set_pixel( PIXEL* pixel, Fixed  x )
+{
+    if (x < 0) x = -x;
+    if (x >= FIXED_ONE) x = FIXED_ONE-1;
+    int  idx = FIXED_FRAC(x) >> (FIXED_BITS - PALETTE_BITS);
+    
+    // apply
+    const uint16_t color = palette[idx & (PALETTE_SIZE-1)];
+    if (sizeof(*pixel) == 2) {
+        // RGB565
+        *pixel = color;
+    } else {
+        
+        // covert RGB565 to ARGB with color enhancement
+        uint8_t r = (color & 0xf800) >> 11;
+        r = (r << 3) | (r >> 2); // OR 3 significant bits
+        uint8_t g = (color & 0x07e0) >> 5;
+        g = (g << 2) | (g >> 4); // OR 2 significant bits
+        uint8_t b = (color & 0x001f);
+        b = (b << 3) | (b >> 2); // OR 3 significant bits
+         
+        //*pixel = 255 << 24 | r << 16 | g << 8 | b;
+        // note: this is backward
+        *pixel = b << 24 | g << 16 | r << 8 | 255;
+        // inline
+        //*pixel = ((color & 0x001f) << 3) << 24 | ((color & 0x07e0) >> 5) << 2 << 16 | ((color & 0xf800) >> 11) << 3 << 8 | 255;
+    }
 }
 
 /* Angles expressed as fixed point radians */
@@ -90,8 +120,9 @@ void init_tables(void)
     init_angles();
 }
 
-void fill_plasma( BitmapInfo*  info, void*  pixels, double  t )
+void fill_plasma(void* pixels, const int width, const int height, const unsigned long t)
 {
+    const int stride = sizeof(PIXEL) * width;
     Fixed yt1 = FIXED_FROM_FLOAT(t/1230.);
     Fixed yt2 = yt1;
     Fixed xt10 = FIXED_FROM_FLOAT(t/3000.);
@@ -101,8 +132,8 @@ void fill_plasma( BitmapInfo*  info, void*  pixels, double  t )
 #define  YT2_INCR   FIXED_FROM_FLOAT(1/163.)
     
     int  yy;
-    for (yy = 0; yy < info->height; yy++) {
-        uint16_t*  line = (uint16_t*)pixels;
+    for (yy = 0; yy < height; yy++) {
+        PIXEL*  line = (PIXEL*)pixels;
         Fixed      base = fixed_sin(yt1) + fixed_sin(yt2);
         Fixed      xt1 = xt10;
         Fixed      xt2 = xt20;
@@ -117,7 +148,7 @@ void fill_plasma( BitmapInfo*  info, void*  pixels, double  t )
         /* optimize memory writes by generating one aligned 32-bit store
          * for every pair of pixels.
          */
-        uint16_t*  line_end = line + info->width;
+        PIXEL*  line_end = line + width;
         
         if (line < line_end) {
             if (((uint32_t)(uintptr_t)line & 3) != 0) {
@@ -126,7 +157,8 @@ void fill_plasma( BitmapInfo*  info, void*  pixels, double  t )
                 xt1 += XT1_INCR;
                 xt2 += XT2_INCR;
                 
-                line[0] = palette_from_fixed(ii >> 2);
+                //line[0] = palette_from_fixed(ii >> 2);
+                set_pixel(line, ii >> 2);
                 line++;
             }
             
@@ -143,15 +175,15 @@ void fill_plasma( BitmapInfo*  info, void*  pixels, double  t )
                 //uint32_t  pixel = ((uint32_t)palette_from_fixed(i1 >> 2) << 16) | (uint32_t)palette_from_fixed(i2 >> 2);
                 //((uint32_t*)line)[0] = pixel;
                 // ...by this
-                line[0] = palette_from_fixed(i1 >> 2);
-                line[1] = palette_from_fixed(i2 >> 2);
+                set_pixel(line, i1 >> 2);
+                set_pixel(line + 1, i2 >> 2);
                 
                 line += 2;
             }
             
             if (line < line_end) {
                 Fixed ii = base + fixed_sin(xt1) + fixed_sin(xt2);
-                line[0] = palette_from_fixed(ii >> 2);
+                set_pixel(line, ii >> 2);
                 line++;
             }
         }
@@ -164,12 +196,12 @@ void fill_plasma( BitmapInfo*  info, void*  pixels, double  t )
             xt1 += XT1_INCR;
             xt2 += XT2_INCR;
             
-            line[xx] = palette_from_fixed(ii / 4);
+            set_pixel(line + xx, ii >> 2);
         }
 #endif /* !OPTIMIZE_WRITES */
         
         // go to next line
-        pixels = (char*)pixels + info->stride;
+        pixels = (char*)pixels + stride;
     }
 }
 
@@ -246,7 +278,7 @@ void stats_endFrame( Stats*  s )
     s->lastTime = now;
 }
 
-void renderPlasma(BitmapInfo * info, void* pixels, long time_ms)
+void renderPlasma(void* pixels, const int width, const int height, const unsigned long time_ms)
 {
     //BitmapInfo         info;
     //void*              pixels;
@@ -277,7 +309,7 @@ void renderPlasma(BitmapInfo * info, void* pixels, long time_ms)
     stats_startFrame(&stats);
     
     // Now fill the values with a nice little plasma
-    fill_plasma(info, pixels, time_ms);
+    fill_plasma(pixels, width, height, time_ms);
     
     //AndroidBitmap_unlockPixels(env, bitmap);
     

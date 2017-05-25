@@ -11,17 +11,16 @@ import Foundation
 
 class ViewController: UIViewController {
     let INTERVAL: Double = 1.0 / 30
-    let BYTES_PER_PIXEL = 3
-    let IMAGE_SCALE: CGFloat  = 0.75
+    let BYTES_PER_PIXEL = 4
+    let IMAGE_SCALE: CGFloat  = 1
     
     var uiImageView: UIImageView?
     
     var imageWidth = 0
     var imageHeight = 0
-    var bitmapInfo: BitmapInfo?
-    var pixels565: [UInt16]?
-    var pixelsARGB: [UInt8]?
-    var frame: Int = 0
+    //var pixels565: [UInt16]?
+    var pixelsARGB: [UInt32]?
+    var frame: UInt = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,9 +31,8 @@ class ViewController: UIViewController {
         // define bitmap info for plasma
         imageWidth = Int(round(screenBounds.width * IMAGE_SCALE))
         imageHeight = Int(round(screenBounds.height * IMAGE_SCALE))
-        bitmapInfo = BitmapInfo(width: CInt(imageWidth), height: CInt(imageHeight), stride: CInt(imageWidth * 2));
-        pixels565 = [UInt16](count: Int(imageWidth * imageHeight), repeatedValue: 0);
-        pixelsARGB = [UInt8](count: Int(imageWidth * imageHeight) * BYTES_PER_PIXEL, repeatedValue: 0);
+        // pixels565 = [UInt16](count: Int(imageWidth * imageHeight), repeatedValue: 0);
+        pixelsARGB = [UInt32](count: Int(imageWidth * imageHeight), repeatedValue: 0);
         
         // create UIImageView
         uiImageView = UIImageView(frame: screenBounds)
@@ -54,9 +52,37 @@ class ViewController: UIViewController {
     
     func render()
     {
-        renderPlasma(&bitmapInfo!, &pixels565!, frame)
-        frame += Int(INTERVAL * 1000)
-     
+        renderPlasma(&pixelsARGB!, CInt(imageWidth), CInt(imageHeight), frame)
+        frame += UInt(INTERVAL * 1000)
+        
+        // prepping for CGImage
+        let bitsPerComponent = 8
+        let bitsPerPixel = bitsPerComponent * BYTES_PER_PIXEL
+        let bytesPerRow = imageWidth * BYTES_PER_PIXEL
+        let providerRef = CGDataProviderCreateWithCFData(
+            NSData(bytes: pixelsARGB!, length: pixelsARGB!.count * BYTES_PER_PIXEL)
+        )
+        
+        let cgim = CGImageCreate(
+            imageWidth,
+            imageHeight,
+            bitsPerComponent,
+            bitsPerPixel,
+            bytesPerRow,
+            CGColorSpaceCreateDeviceRGB(),
+            CGBitmapInfo(rawValue: CGImageAlphaInfo.PremultipliedFirst.rawValue),
+            providerRef,
+            nil,
+            false,
+            .RenderingIntentDefault
+        )
+        
+        // TODO is there a better way?
+        uiImageView?.image = UIImage(CGImage: cgim!)
+    }
+    
+    /*
+    private func convert2RBG() -> CGImage? {
         var index = 0
         var r, g, b: UInt8
         // convert the pixels to ARGB
@@ -85,7 +111,7 @@ class ViewController: UIViewController {
             NSData(bytes: pixelsARGB!, length: pixelsARGB!.count)
         )
         
-        let cgim = CGImageCreate(
+        return CGImageCreate(
             imageWidth,
             imageHeight,
             bitsPerComponent,
@@ -98,10 +124,7 @@ class ViewController: UIViewController {
             false,
             .RenderingIntentDefault
         )
-        
-        // TODO optimize this!!!
-        uiImageView?.image = UIImage(CGImage: cgim!)
-    }
+    }*/
 }
 
 
