@@ -4,7 +4,7 @@ This is the iOS version of the original Android NDK's Bitmap Plasma C/C++ librar
 https://github.com/googlesamples/android-ndk/tree/master/bitmap-plasma
 
 ## Screenshots
-<img src="https://github.com/longngo78/ios-plasma/blob/master/screenshots/Simulator%20Screen%20Shot%20May%2026,%202017,%202.12.25%20PM.png?raw=true" width="300"><img src="https://github.com/longngo78/ios-plasma/blob/master/screenshots/Simulator%20Screen%20Shot%20May%2026,%202017,%202.12.44%20PM.png?raw=true" width="300"><img src="https://github.com/longngo78/ios-plasma/blob/master/screenshots/Simulator%20Screen%20Shot%20May%2026,%202017,%202.13.03%20PM.png?raw=true" width="300">
+<img src="https://github.com/longngo78/ios-plasma/blob/master/screenshots/Simulator%20Screen%20Shot%20May%2026,%202017,%202.12.25%20PM.png?raw=true" width="240"><img src="https://github.com/longngo78/ios-plasma/blob/master/screenshots/Simulator%20Screen%20Shot%20May%2026,%202017,%202.12.44%20PM.png?raw=true" width="240"><img src="https://github.com/longngo78/ios-plasma/blob/master/screenshots/Simulator%20Screen%20Shot%20May%2026,%202017,%202.13.03%20PM.png?raw=true" width="240">
 
 ## Objectives:
 1. Ability to reuse C/C++ library, across different platforms.
