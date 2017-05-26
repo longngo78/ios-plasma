@@ -5,7 +5,7 @@ https://github.com/googlesamples/android-ndk/tree/master/bitmap-plasma
 
 ## Screenshots
 -----------
-![screenshot](https://github.com/longngo78/ios-plasma/blob/master/screenshots/Simulator%20Screen%20Shot%20May%2026,%202017,%202.12.25%20PM.png?raw=true)
+<img src="https://github.com/longngo78/ios-plasma/blob/master/screenshots/Simulator%20Screen%20Shot%20May%2026,%202017,%202.12.25%20PM.png?raw=true" width="500">
 ![screenshot](https://github.com/longngo78/ios-plasma/blob/master/screenshots/Simulator%20Screen%20Shot%20May%2026,%202017,%202.12.35%20PM.png?raw=true)
 ![screenshot](https://github.com/longngo78/ios-plasma/blob/master/screenshots/Simulator%20Screen%20Shot%20May%2026,%202017,%202.12.44%20PM.png?raw=true)
 ![screenshot](https://github.com/longngo78/ios-plasma/blob/master/screenshots/Simulator%20Screen%20Shot%20May%2026,%202017,%202.13.03%20PM.png?raw=true)
