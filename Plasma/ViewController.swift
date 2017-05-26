@@ -15,12 +15,13 @@ class ViewController: UIViewController {
     let IMAGE_SCALE: CGFloat  = 1
     
     var uiImageView: UIImageView?
+    var slider: UISlider?
     
     var imageWidth = 0
     var imageHeight = 0
     //var pixels565: [UInt16]?
     var pixelsARGB: [UInt32]?
-    var frame: UInt = 0
+    var time: Int = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,10 +40,27 @@ class ViewController: UIViewController {
         //uiImageView?.contentMode = .ScaleAspectFill
         view.addSubview(uiImageView!)
         
+        // speed slider
+        let sliderWidth = screenBounds.width * 0.9
+        let sliderX = (screenBounds.width - sliderWidth) * 0.5
+        slider = UISlider(frame: CGRectMake(sliderX, screenBounds.height - 50, sliderWidth, 20))
+        slider!.minimumValue = -2
+        slider!.maximumValue = 2
+        slider!.continuous = true
+        //sliderDemo.tintColor = UIColor.redColor()
+        slider!.value = -1
+        //slider!.addTarget(self, action: "sliderValueDidChange:", forControlEvents: .ValueChanged)
+        view.addSubview(slider!)
+        
         // schedule repeated render
         NSTimer.scheduledTimerWithTimeInterval(INTERVAL, target: self,
                                                selector: #selector(ViewController.render),
                                                userInfo: nil, repeats: true)
+    }
+    
+    func sliderValueDidChange(sender: UISlider!)
+    {
+        print("value: \(sender.value)")
     }
 
     override func didReceiveMemoryWarning() {
@@ -52,8 +70,8 @@ class ViewController: UIViewController {
     
     func render()
     {
-        renderPlasma(&pixelsARGB!, CInt(imageWidth), CInt(imageHeight), frame)
-        frame += UInt(INTERVAL * 1000)
+        renderPlasma(&pixelsARGB!, CInt(imageWidth), CInt(imageHeight), time)
+        time += Int(INTERVAL * 1000 * Double(-slider!.value))
         
         // prepping for CGImage
         let bitsPerComponent = 8

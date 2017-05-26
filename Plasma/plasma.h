@@ -72,6 +72,6 @@ typedef struct {
 } Stats;
 
 // apis
-void renderPlasma(void *pixels, const int width, const int height, const unsigned long time_ms);
+void renderPlasma(void *pixels, const int width, const int height, const long time_ms);
 
 #endif /* plasma_h */

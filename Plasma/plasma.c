@@ -67,7 +67,7 @@ static void init_tables(void) {
     init_angles();
 }
 
-static void fill_plasma(void *pixels, const int width, const int height, const unsigned long t) {
+static void fill_plasma(void *pixels, const int width, const int height, const long t) {
     const int stride = sizeof(PIXEL) * width;
     Fixed yt1 = FIXED_FROM_FLOAT(t / 1230.);
     Fixed yt2 = yt1;
@@ -228,7 +228,7 @@ static void stats_endFrame( Stats*  s )
 
 #endif
 
-void renderPlasma(void *pixels, const int width, const int height, const unsigned long time_ms) {
+void renderPlasma(void *pixels, const int width, const int height, const long time_ms) {
     static int init;
     
 #if STATS_ENABLED == 1
