@@ -19,6 +19,7 @@ class ViewController: UIViewController {
     
     var imageWidth = 0
     var imageHeight = 0
+    var touching = false
     var touchX = 0
     var touchY = 0
     var touchRadius = 100
@@ -76,11 +77,14 @@ class ViewController: UIViewController {
     
     func render()
     {
-        renderPlasma(&pixelsARGB!, CInt(imageWidth), CInt(imageHeight), time, CInt(touchX), CInt(touchY), CInt(touchRadius))
-        time += Int(INTERVAL * 1000 * Double(-slider!.value))
-        if (touchRadius > 0) {
+        if (touching) {
+            touchRadius = min(touchRadius + 1, maxRadius)
+        } else if (touchRadius > 0) {
             touchRadius -= 1
         }
+        renderPlasma(&pixelsARGB!, CInt(imageWidth), CInt(imageHeight), time, CInt(touchX), CInt(touchY), CInt(touchRadius))
+        time += Int(INTERVAL * 1000 * Double(-slider!.value))
+        
         
         // prepping for CGImage
         let bitsPerComponent = 8
@@ -114,10 +118,16 @@ class ViewController: UIViewController {
         if let touch = touches.first {
             let pos = touch.location(in: uiImageView)
             //print(pos);
+            touching = true
             touchX = Int(pos.x)
             touchY = Int(pos.y)
-            touchRadius = min(touchRadius + imageWidth / 5, maxRadius)
         }
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesEnded(touches, with: event)
+        
+        touching = false
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -128,7 +138,6 @@ class ViewController: UIViewController {
             //print(pos);
             touchX = Int(pos.x)
             touchY = Int(pos.y)
-            touchRadius = min(touchRadius + 5, maxRadius)
         }
     }
     
