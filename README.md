@@ -22,7 +22,7 @@ https://github.com/googlesamples/android-ndk/tree/master/bitmap-plasma
 
 ## Requirements:
 1. XCode 8.x
-2. Swift 2.x
+2. Swift 3
 3. C/C++
 
 ## Improvements needed:
