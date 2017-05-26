@@ -32,13 +32,13 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         
         // get screen size
-        let screenBounds = UIScreen.mainScreen().bounds
+        let screenBounds = UIScreen.main.bounds
         
         // define bitmap info for plasma
         imageWidth = Int(round(screenBounds.width * IMAGE_SCALE))
         imageHeight = Int(round(screenBounds.height * IMAGE_SCALE))
         // pixels565 = [UInt16](count: Int(imageWidth * imageHeight), repeatedValue: 0);
-        pixelsARGB = [UInt32](count: Int(imageWidth * imageHeight), repeatedValue: 0);
+        pixelsARGB = [UInt32](repeating: 0, count: Int(imageWidth * imageHeight));
         maxRadius = imageWidth / 3
         
         // create UIImageView
@@ -49,22 +49,22 @@ class ViewController: UIViewController {
         // speed slider
         let sliderWidth = screenBounds.width * 0.9
         let sliderX = (screenBounds.width - sliderWidth) * 0.5
-        slider = UISlider(frame: CGRectMake(sliderX, screenBounds.height - 50, sliderWidth, 20))
+        slider = UISlider(frame: CGRect(x: sliderX, y: screenBounds.height - 50, width: sliderWidth, height: 20))
         slider!.minimumValue = -2
         slider!.maximumValue = 2
-        slider!.continuous = true
+        slider!.isContinuous = true
         //sliderDemo.tintColor = UIColor.redColor()
         slider!.value = -1
         //slider!.addTarget(self, action: "sliderValueDidChange:", forControlEvents: .ValueChanged)
         view.addSubview(slider!)
         
         // schedule repeated render
-        NSTimer.scheduledTimerWithTimeInterval(INTERVAL, target: self,
+        Timer.scheduledTimer(timeInterval: INTERVAL, target: self,
                                                selector: #selector(self.render),
                                                userInfo: nil, repeats: true)
     }
     
-    func sliderValueDidChange(sender: UISlider!)
+    func sliderValueDidChange(_ sender: UISlider!)
     {
         print("value: \(sender.value)")
     }
@@ -86,33 +86,33 @@ class ViewController: UIViewController {
         let bitsPerComponent = 8
         let bitsPerPixel = bitsPerComponent * BYTES_PER_PIXEL
         let bytesPerRow = imageWidth * BYTES_PER_PIXEL
-        let providerRef = CGDataProviderCreateWithCFData(
-            NSData(bytes: pixelsARGB!, length: pixelsARGB!.count * BYTES_PER_PIXEL)
-        )
+        //let cfdata = Data(bytes: UnsafePointer<UInt8>(pixelsARGB!), count: pixelsARGB!.count * BYTES_PER_PIXEL) as CFData
+        let cfdata = Data(bytes: pixelsARGB!, count: pixelsARGB!.count * BYTES_PER_PIXEL) as CFData
+        let providerRef = CGDataProvider(data: cfdata)
         
-        let cgim = CGImageCreate(
-            imageWidth,
-            imageHeight,
-            bitsPerComponent,
-            bitsPerPixel,
-            bytesPerRow,
-            CGColorSpaceCreateDeviceRGB(),
-            CGBitmapInfo(rawValue: CGImageAlphaInfo.PremultipliedFirst.rawValue),
-            providerRef,
-            nil,
-            false,
-            .RenderingIntentDefault
+        let cgim = CGImage(
+            width: imageWidth,
+            height: imageHeight,
+            bitsPerComponent: bitsPerComponent,
+            bitsPerPixel: bitsPerPixel,
+            bytesPerRow: bytesPerRow,
+            space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedFirst.rawValue),
+            provider: providerRef!,
+            decode: nil,
+            shouldInterpolate: false,
+            intent: .defaultIntent
         )
         
         // TODO: is there a better way?
-        uiImageView?.image = UIImage(CGImage: cgim!)
+        uiImageView?.image = UIImage(cgImage: cgim!)
     }
     
-    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        super.touchesBegan(touches, withEvent: event)
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
         
         if let touch = touches.first {
-            let pos = touch.locationInView(uiImageView)
+            let pos = touch.location(in: uiImageView)
             //print(pos);
             touchX = Int(pos.x)
             touchY = Int(pos.y)
@@ -120,11 +120,11 @@ class ViewController: UIViewController {
         }
     }
     
-    override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
-        super.touchesMoved(touches, withEvent: event)
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesMoved(touches, with: event)
         
         if let touch = touches.first {
-            let pos = touch.locationInView(uiImageView)
+            let pos = touch.location(in: uiImageView)
             //print(pos);
             touchX = Int(pos.x)
             touchY = Int(pos.y)
