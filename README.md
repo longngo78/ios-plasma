@@ -1,6 +1,6 @@
 # Bitmap Plasma - iOS Demo
 
-This is the iOS version of the original Android NDK Plasma Demo, which can be found at:
+This is the iOS version of the original Android NDK's Bitmap Plasma Demo, which can be found at:
 https://github.com/googlesamples/android-ndk/tree/master/bitmap-plasma
 
 # Modifications:
@@ -11,3 +11,5 @@ https://github.com/googlesamples/android-ndk/tree/master/bitmap-plasma
 # Improvements needed:
 1. A better way to access to CGImage's bitmap-data directly.
 2. GPU support.
+
+# Any contribution is welcomed!
