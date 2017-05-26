@@ -107,16 +107,20 @@ class ViewController: UIViewController {
     func render()
     {
         if (touching) {
-            touchRadius = min(touchRadius + 1, maxRadius)
+            if (touchRadius < maxRadius) {
+                touchRadius += 1
+            }
         } else if (touchRadius > 0) {
             touchRadius -= 1
         }
+        // time flies
+        time += Int(Float(INTERVAL * 1000) * speed)
+        
+        // render here
         render_plasma(&pixelsARGB!,
                       CInt(imageWidth), CInt(imageHeight), time,
                       CInt(Float(touchX) * imageScale), CInt(Float(touchY) * imageScale),
-                      CInt(Float(touchRadius) * imageScale))
-        time += Int(Float(INTERVAL * 1000) * speed)
-        
+                      CInt(touchRadius))
         
         // prepping for CGImage
         let bitsPerComponent = 8

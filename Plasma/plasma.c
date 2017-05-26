@@ -36,6 +36,7 @@ static __inline__ PIXEL make_color(const int r, const int g, const int b, const 
     else if (v == 3) return MAKE_ARGB_3(r, g, b);
     else if (v == 4) return MAKE_ARGB_4(r, g, b);
     else if (v == 5) return MAKE_ARGB_5(r, g, b);
+    else if (v == 6) return MAKE_ARGB_6(r, g, b);
     
     return MAKE_COLOR(r, g, b);
 }
