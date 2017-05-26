@@ -12,11 +12,13 @@ import Foundation
 class ViewController: UIViewController {
     let INTERVAL: Double = 1.0 / 45
     let BYTES_PER_PIXEL = 4
-    let IMAGE_SCALE: CGFloat  = 1
     
+    let screenBounds = UIScreen.main.bounds
     var uiImageView: UIImageView?
-    var slider: UISlider?
     
+    var palette = 0
+    var speed: Float = 1.0
+    var imageScale: Float = 1.0
     var imageWidth = 0
     var imageHeight = 0
     var touching = false
@@ -32,32 +34,46 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // get screen size
-        let screenBounds = UIScreen.main.bounds
-        
         // define bitmap info for plasma
-        imageWidth = Int(round(screenBounds.width * IMAGE_SCALE))
-        imageHeight = Int(round(screenBounds.height * IMAGE_SCALE))
+        imageWidth = Int(round(screenBounds.width * CGFloat(imageScale)))
+        imageHeight = Int(round(screenBounds.height * CGFloat(imageScale)))
         // pixels565 = [UInt16](count: Int(imageWidth * imageHeight), repeatedValue: 0);
         pixelsARGB = [UInt32](repeating: 0, count: Int(imageWidth * imageHeight));
-        maxRadius = imageWidth / 3
+        maxRadius = Int(screenBounds.width / 3)
         
         // create UIImageView
         uiImageView = UIImageView(frame: screenBounds)
         //uiImageView?.contentMode = .ScaleAspectFill
         view.addSubview(uiImageView!)
         
+        // palette button
+        let button = UIButton(type: UIButtonType.contactAdd);
+        button.frame = CGRect(x: 10, y: 20, width: 50, height: 50)
+        //button.backgroundColor = UIColor.gray
+        button.addTarget(self, action: #selector(buttonPressed), for: .touchUpInside)
+        view.addSubview(button)
+        
+        // zoom stepper
+        let stepper = UIStepper(frame: CGRect(x: screenBounds.width - 120, y: 30, width: 100, height: 50))
+        stepper.wraps = false
+        stepper.autorepeat = false
+        stepper.minimumValue = 0
+        stepper.maximumValue = 0.5
+        stepper.stepValue = 0.1
+        stepper.value = 1 - Double(imageScale)
+        stepper.addTarget(self, action: #selector(stepperValueChanged), for: .valueChanged)
+        view.addSubview(stepper)
+        
         // speed slider
         let sliderWidth = screenBounds.width * 0.9
         let sliderX = (screenBounds.width - sliderWidth) * 0.5
-        slider = UISlider(frame: CGRect(x: sliderX, y: screenBounds.height - 50, width: sliderWidth, height: 20))
-        slider!.minimumValue = -2
-        slider!.maximumValue = 2
-        slider!.isContinuous = true
-        //sliderDemo.tintColor = UIColor.redColor()
-        slider!.value = -1
-        //slider!.addTarget(self, action: "sliderValueDidChange:", forControlEvents: .ValueChanged)
-        view.addSubview(slider!)
+        let slider = UISlider(frame: CGRect(x: sliderX, y: screenBounds.height - 50, width: sliderWidth, height: 20))
+        slider.minimumValue = -2
+        slider.maximumValue = 2
+        slider.isContinuous = true
+        slider.value = -speed
+        slider.addTarget(self, action: #selector(sliderValueDidChange), for: .valueChanged)
+        view.addSubview(slider)
         
         // schedule repeated render
         Timer.scheduledTimer(timeInterval: INTERVAL, target: self,
@@ -65,9 +81,22 @@ class ViewController: UIViewController {
                                                userInfo: nil, repeats: true)
     }
     
-    func sliderValueDidChange(_ sender: UISlider!)
+    @IBAction func buttonPressed(_ sender: UIButton!)
     {
-        print("value: \(sender.value)")
+        palette += 1
+        set_palette(CInt(palette))
+    }
+    
+    @IBAction func stepperValueChanged(_ sender: UIStepper!)
+    {
+        imageScale = Float(1 - sender.value)
+        imageWidth = Int(round(screenBounds.width * CGFloat(imageScale)))
+        imageHeight = Int(round(screenBounds.height * CGFloat(imageScale)))
+    }
+    
+    @IBAction func sliderValueDidChange(_ sender: UISlider!)
+    {
+        speed = Float(-sender!.value)
     }
 
     override func didReceiveMemoryWarning() {
@@ -82,16 +111,18 @@ class ViewController: UIViewController {
         } else if (touchRadius > 0) {
             touchRadius -= 1
         }
-        renderPlasma(&pixelsARGB!, CInt(imageWidth), CInt(imageHeight), time, CInt(touchX), CInt(touchY), CInt(touchRadius))
-        time += Int(INTERVAL * 1000 * Double(-slider!.value))
+        render_plasma(&pixelsARGB!,
+                      CInt(imageWidth), CInt(imageHeight), time,
+                      CInt(Float(touchX) * imageScale), CInt(Float(touchY) * imageScale),
+                      CInt(Float(touchRadius) * imageScale))
+        time += Int(Float(INTERVAL * 1000) * speed)
         
         
         // prepping for CGImage
         let bitsPerComponent = 8
         let bitsPerPixel = bitsPerComponent * BYTES_PER_PIXEL
         let bytesPerRow = imageWidth * BYTES_PER_PIXEL
-        //let cfdata = Data(bytes: UnsafePointer<UInt8>(pixelsARGB!), count: pixelsARGB!.count * BYTES_PER_PIXEL) as CFData
-        let cfdata = Data(bytes: pixelsARGB!, count: pixelsARGB!.count * BYTES_PER_PIXEL) as CFData
+        let cfdata = Data(bytes: pixelsARGB!, count: (imageWidth * imageHeight) * BYTES_PER_PIXEL) as CFData
         let providerRef = CGDataProvider(data: cfdata)
         
         let cgim = CGImage(
