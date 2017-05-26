@@ -38,12 +38,12 @@ typedef struct {
 // pixel formats
 #define RGB565 uint16_t
 #define ARGB uint32_t
+// you can set this to be either RGB565 or ARGB
 #define PIXEL ARGB
-#define PIXEL2 (sizeof(PIXEL) == 2) ? uint32_t : uint64_t
 
 // make colors
 #define CONCAT(a, b) a ## b
-#define VARIANT 4
+#define VARIANTS 6
 #define MAKE_ARGB_0(r, g, b) (ARGB)( b << 24 | g << 16 | r << 8 | 255 )
 #define MAKE_ARGB_1(r, g, b) (ARGB)( b << 24 | g << 8 | r << 16 | 255 )
 #define MAKE_ARGB_2(r, g, b) (ARGB)( b << 16 | g << 24 | r << 8 | 255 )
@@ -53,7 +53,7 @@ typedef struct {
 #define MAKE_ARGB_V(r, g, b, v) CONCAT(MAKE_ARGB_, v)(r, g, b)
 
 #define MAKE_565(r, g, b) (RGB565)( ((r << 8) & 0xf800) | ((g << 3) & 0x07e0) | ((b  >> 3) & 0x001f) )
-#define MAKE_COLOR(r, g, b) (sizeof(PIXEL) == 2) ? MAKE_565((r), (g), (b)) : MAKE_ARGB_V((r), (g), (b), VARIANT)
+#define MAKE_COLOR(r, g, b) (sizeof(PIXEL) == 2) ? MAKE_565((r), (g), (b)) : MAKE_ARGB_0((r), (g), (b))
 
 // animation
 #define XT1_INCR   FIXED_FROM_FLOAT(1/240.)
@@ -76,6 +76,8 @@ typedef struct {
 } Stats;
 
 // apis
-void renderPlasma(void *pixels, const int width, const int height, const long time_ms, const int touchX, const int touchY, const int radius);
+void render_plasma(void *pixels, const int width, const int height, const long time_ms,
+                   const int touchX, const int touchY, const int radius);
+void set_palette(const int variant);
 
 #endif /* plasma_h */

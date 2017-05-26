@@ -28,27 +28,40 @@
 
 static PIXEL palette[PALETTE_SIZE];
 
-static void init_palette(void) {
+static __inline__ PIXEL make_color(const int r, const int g, const int b, const int variant) {
+    const int v = variant % VARIANTS;
+    
+    if (v == 1) return MAKE_ARGB_1(r, g, b);
+    else if (v == 2) return MAKE_ARGB_2(r, g, b);
+    else if (v == 3) return MAKE_ARGB_3(r, g, b);
+    else if (v == 4) return MAKE_ARGB_4(r, g, b);
+    else if (v == 5) return MAKE_ARGB_5(r, g, b);
+    
+    return MAKE_COLOR(r, g, b);
+}
+
+void set_palette(const int variant) {
     int nn, mm = 0;
+    
     /* fun with colors */
     for (nn = 0; nn < PALETTE_SIZE / 4; nn++) {
         int jj = (nn - mm) * 4 * 255 / PALETTE_SIZE;
-        palette[nn] = MAKE_COLOR(255, jj, 255 - jj);
+        palette[nn] = make_color(255, jj, 255 - jj, variant);
     }
     
     for (mm = nn; nn < PALETTE_SIZE / 2; nn++) {
         int jj = (nn - mm) * 4 * 255 / PALETTE_SIZE;
-        palette[nn] = MAKE_COLOR(255 - jj, 255, jj);
+        palette[nn] = make_color(255 - jj, 255, jj, variant);
     }
     
     for (mm = nn; nn < PALETTE_SIZE * 3 / 4; nn++) {
         int jj = (nn - mm) * 4 * 255 / PALETTE_SIZE;
-        palette[nn] = MAKE_COLOR(0, 255 - jj, 255);
+        palette[nn] = make_color(0, 255 - jj, 255, variant);
     }
     
     for (mm = nn; nn < PALETTE_SIZE; nn++) {
         int jj = (nn - mm) * 4 * 255 / PALETTE_SIZE;
-        palette[nn] = MAKE_COLOR(jj, 0, 255);
+        palette[nn] = make_color(jj, 0, 255, variant);
     }
 }
 
@@ -63,7 +76,7 @@ static __inline__ PIXEL palette_from_fixed(Fixed x) {
 /* Angles expressed as fixed point radians */
 
 static void init_tables(void) {
-    init_palette();
+    set_palette(0);
     init_angles();
 }
 
@@ -238,7 +251,7 @@ static void stats_endFrame( Stats*  s )
 
 #endif
 
-void renderPlasma(void *pixels, const int width, const int height, const long time_ms, const int touchX, const int touchY, const int radius) {
+void render_plasma(void *pixels, const int width, const int height, const long time_ms, const int touchX, const int touchY, const int radius) {
     static int init;
     
 #if STATS_ENABLED == 1
