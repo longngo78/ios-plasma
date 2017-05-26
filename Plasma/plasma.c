@@ -67,8 +67,9 @@ static void init_tables(void) {
     init_angles();
 }
 
-static void fill_plasma(void *pixels, const int width, const int height, const long t) {
+static void fill_plasma(void *pixels, const int width, const int height, const long t, const int touchX, const int touchY, const int radius) {
     const int stride = sizeof(PIXEL) * width;
+    
     Fixed yt1 = FIXED_FROM_FLOAT(t / 1230.);
     Fixed yt2 = yt1;
     Fixed xt10 = FIXED_FROM_FLOAT(t / 3000.);
@@ -101,12 +102,21 @@ static void fill_plasma(void *pixels, const int width, const int height, const l
                 line++;
             }
             
+            int xx = 0;
             while (line + 2 <= line_end) {
-                Fixed i1 = base + fixed_sin(xt1) + fixed_sin(xt2);
+                xx += 2;
+                int factor = 0;
+                if (radius > 0) {
+                    const int distance = (xx - touchX) * (xx - touchX) + (yy - touchY) * (yy - touchY);
+                    const int rq = radius * radius;
+                    factor = distance < rq ? /*round*/((rq - distance) * radius / 30) : 0;
+                }
+                
+                Fixed i1 = base + fixed_sin(xt1 + factor) + fixed_sin(xt2 + factor);
                 xt1 += XT1_INCR;
                 xt2 += XT2_INCR;
                 
-                Fixed i2 = base + fixed_sin(xt1) + fixed_sin(xt2);
+                Fixed i2 = base + fixed_sin(xt1 + factor) + fixed_sin(xt2 + factor);
                 xt1 += XT1_INCR;
                 xt2 += XT2_INCR;
                 
@@ -228,7 +238,7 @@ static void stats_endFrame( Stats*  s )
 
 #endif
 
-void renderPlasma(void *pixels, const int width, const int height, const long time_ms) {
+void renderPlasma(void *pixels, const int width, const int height, const long time_ms, const int touchX, const int touchY, const int radius) {
     static int init;
     
 #if STATS_ENABLED == 1
@@ -243,7 +253,7 @@ void renderPlasma(void *pixels, const int width, const int height, const long ti
     stats_startFrame(&stats);
     
     // Now fill the values with a nice little plasma
-    fill_plasma(pixels, width, height, time_ms);
+    fill_plasma(pixels, width, height, time_ms, touchX, touchY, radius);
     
     stats_endFrame(&stats);
     
@@ -254,7 +264,7 @@ void renderPlasma(void *pixels, const int width, const int height, const long ti
     }
     
     // Now fill the values with a nice little plasma
-    fill_plasma(pixels, width, height, time_ms);
+    fill_plasma(pixels, width, height, time_ms, touchX, touchY, radius);
     
 #endif
     

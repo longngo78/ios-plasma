@@ -19,6 +19,11 @@ class ViewController: UIViewController {
     
     var imageWidth = 0
     var imageHeight = 0
+    var touchX = 0
+    var touchY = 0
+    var touchRadius = 100
+    var maxRadius = 0
+    
     //var pixels565: [UInt16]?
     var pixelsARGB: [UInt32]?
     var time: Int = 0
@@ -34,6 +39,7 @@ class ViewController: UIViewController {
         imageHeight = Int(round(screenBounds.height * IMAGE_SCALE))
         // pixels565 = [UInt16](count: Int(imageWidth * imageHeight), repeatedValue: 0);
         pixelsARGB = [UInt32](count: Int(imageWidth * imageHeight), repeatedValue: 0);
+        maxRadius = imageWidth / 3
         
         // create UIImageView
         uiImageView = UIImageView(frame: screenBounds)
@@ -54,7 +60,7 @@ class ViewController: UIViewController {
         
         // schedule repeated render
         NSTimer.scheduledTimerWithTimeInterval(INTERVAL, target: self,
-                                               selector: #selector(ViewController.render),
+                                               selector: #selector(self.render),
                                                userInfo: nil, repeats: true)
     }
     
@@ -70,8 +76,11 @@ class ViewController: UIViewController {
     
     func render()
     {
-        renderPlasma(&pixelsARGB!, CInt(imageWidth), CInt(imageHeight), time)
+        renderPlasma(&pixelsARGB!, CInt(imageWidth), CInt(imageHeight), time, CInt(touchX), CInt(touchY), CInt(touchRadius))
         time += Int(INTERVAL * 1000 * Double(-slider!.value))
+        if (touchRadius > 0) {
+            touchRadius -= 1
+        }
         
         // prepping for CGImage
         let bitsPerComponent = 8
@@ -97,6 +106,30 @@ class ViewController: UIViewController {
         
         // TODO: is there a better way?
         uiImageView?.image = UIImage(CGImage: cgim!)
+    }
+    
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        super.touchesBegan(touches, withEvent: event)
+        
+        if let touch = touches.first {
+            let pos = touch.locationInView(uiImageView)
+            //print(pos);
+            touchX = Int(pos.x)
+            touchY = Int(pos.y)
+            touchRadius = min(touchRadius + imageWidth / 5, maxRadius)
+        }
+    }
+    
+    override func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        super.touchesMoved(touches, withEvent: event)
+        
+        if let touch = touches.first {
+            let pos = touch.locationInView(uiImageView)
+            //print(pos);
+            touchX = Int(pos.x)
+            touchY = Int(pos.y)
+            touchRadius = min(touchRadius + 5, maxRadius)
+        }
     }
     
     /*

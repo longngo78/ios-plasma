@@ -61,6 +61,10 @@ typedef struct {
 #define YT1_INCR   FIXED_FROM_FLOAT(1/210.)
 #define YT2_INCR   FIXED_FROM_FLOAT(1/163.)
 
+// touch
+#define TOUCH_RADIUS 100
+#define TOUCH_RADIUS_SQR TOUCH_RADIUS * TOUCH_RADIUS
+
 typedef struct {
     double firstTime;
     double lastTime;
@@ -72,6 +76,6 @@ typedef struct {
 } Stats;
 
 // apis
-void renderPlasma(void *pixels, const int width, const int height, const long time_ms);
+void renderPlasma(void *pixels, const int width, const int height, const long time_ms, const int touchX, const int touchY, const int radius);
 
 #endif /* plasma_h */
