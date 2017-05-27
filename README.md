@@ -1,4 +1,4 @@
-# Bitmap Plasma - iOS Demo
+# Plasma Effect - iOS Demo
 
 This is the iOS version of the original Android NDK's Bitmap Plasma C/C++ library, which can be found at:
 https://github.com/googlesamples/android-ndk/tree/master/bitmap-plasma
@@ -25,4 +25,4 @@ https://github.com/googlesamples/android-ndk/tree/master/bitmap-plasma
 1. A better way to access to CGImage's bitmap-data directly.
 2. GPU support.
 
-## Any contribution is welcomed!
+## Any feedback and contribution is welcomed!
